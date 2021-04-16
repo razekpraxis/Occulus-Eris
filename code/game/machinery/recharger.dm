@@ -25,6 +25,44 @@
 	if(cell)
 		to_chat(user, "The charge meter reads [round(cell.percent())]%.")
 
+//Occulus Edit start
+
+/obj/machinery/recharger/default_deconstruction(obj/item/I, mob/user)
+
+	var/qualities = list(QUALITY_SCREW_DRIVING, QUALITY_BOLT_TURNING)
+
+	if(panel_open && circuit)
+		qualities += QUALITY_PRYING
+
+	var/tool_type = I.get_tool_type(user, qualities, src)
+	switch(tool_type)
+		if(QUALITY_PRYING)
+			if(I.use_tool(user, src, WORKTIME_NORMAL, tool_type, FAILCHANCE_HARD, required_stat = STAT_MEC))
+				to_chat(user, SPAN_NOTICE("You remove the components of \the [src] with [I]."))
+				dismantle()
+			return TRUE
+
+		if(QUALITY_SCREW_DRIVING)
+			var/used_sound = panel_open ? 'sound/machines/Custom_screwdriveropen.ogg' :  'sound/machines/Custom_screwdriverclose.ogg'
+			if(I.use_tool(user, src, WORKTIME_NEAR_INSTANT, tool_type, FAILCHANCE_VERY_EASY, required_stat = STAT_MEC, instant_finish_tier = 30, forced_sound = used_sound))
+				updateUsrDialog()
+				panel_open = !panel_open
+				to_chat(user, SPAN_NOTICE("You [panel_open ? "open" : "close"] the maintenance hatch of \the [src] with [I]."))
+				update_icon()
+			return TRUE
+ 		if(QUALITY_BOLT_TURNING)
+			if(charging)
+				to_chat(user, SPAN_WARNING("Remove [charging] first!"))
+				return TRUE
+			if(portable)
+				anchored = !anchored
+				to_chat(user, "You [anchored ? "attached" : "detached"] [src].")
+				playsound(loc, 'sound/items/Ratchet.ogg', 75, 1)
+			return TRUE
+		if(ABORT_CHECK)
+			return TRUE
+	return FALSE
+
 /obj/machinery/recharger/attackby(obj/item/I, mob/user)
 	if(default_deconstruction(I, user))
 		return
@@ -32,15 +70,15 @@
 	if(default_part_replacement(I, user))
 		return
 
-	if(portable && I.has_quality(QUALITY_BOLT_TURNING))
+/*	if(portable && I.has_quality(QUALITY_BOLT_TURNING)) Occulus edit
 		if(charging)
 			to_chat(user, SPAN_WARNING("Remove [charging] first!"))
 			return
 		anchored = !anchored
 		to_chat(user, "You [anchored ? "attached" : "detached"] [src].")
 		playsound(loc, 'sound/items/Ratchet.ogg', 75, 1)
-		return
-
+		return end Occulus Edit
+*/
 	else if (istype(I, /obj/item/weapon/gripper))//Code for allowing cyborgs to use rechargers
 		var/obj/item/weapon/gripper/Gri = I
 		if (charging)//If there's something in the charger
