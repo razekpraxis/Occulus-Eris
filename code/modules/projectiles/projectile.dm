@@ -271,6 +271,9 @@
 	//admin logs
 	if(!no_attack_log)
 		if(ismob(firer))
+			// Destiny Edit for kill verification
+			fier.lastattacked = target_mob
+			target_mob.lastattacker = firer
 
 			var/attacker_message = "shot with \a [src.type]"
 			var/victim_message = "shot with \a [src.type]"

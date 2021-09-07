@@ -98,6 +98,7 @@
 		kill_CH() //We dead... clear any prepared abilities...
 
 	timeofdeath = world.time
+	realtimeofdeath = "\[[time_stamp()]\]" // Destiny Edit to authenticate killer
 	if (isanimal(src))
 		set_death_time(ANIMAL, world.time)
 	else if (ispAI(src) || isdrone(src))

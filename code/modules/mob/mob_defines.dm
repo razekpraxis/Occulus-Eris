@@ -82,6 +82,7 @@ While it would be entirely possible to check the mob's move handlers list for th
 	var/name_archive //For admin things like possession
 
 	var/timeofdeath = 0.0
+	var/realtimeofdeath = ""
 
 	var/bodytemperature = 310.055	//98.7 F
 
